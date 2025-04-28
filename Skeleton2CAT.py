@@ -532,14 +532,14 @@ class Skeleton2CAT:
 			upperArmCAT.boneSegs[se].node.name = upperarms[se].name	
 			self.addFlatBones(upperarms[se],upperArmCAT.boneSegs[se])		
 			self.createTempTransform(upperarms[se],upperArmCAT.boneSegs[se].node )									
-			self.parseHierarchy(upperarms[se],upperArmCAT,exclude+selfbones,maxDepth,depth+1)
+			self.parseHierarchy(upperarms[se],upperArmCAT.boneSegs[se],exclude+selfbones,maxDepth,depth+1)
 			
 			
 		for se in range(numForeArmSegments):			
 			foreArmCAT.boneSegs[se].node.name = forearms[se].name			
 			self.addFlatBones(forearms[se],foreArmCAT.boneSegs[se])
 			self.createTempTransform(forearms[se],foreArmCAT.boneSegs[se].node )
-			self.parseHierarchy(forearms[se],foreArmCAT,exclude+selfbones,maxDepth,depth+1)
+			self.parseHierarchy(forearms[se],foreArmCAT.boneSegs[se],exclude+selfbones,maxDepth,depth+1)
 			
 
 		#do this last while the joints articulate into final position
@@ -725,14 +725,10 @@ class Skeleton2CAT:
 
 	def parseBone(self,parentCAT,c,exclude,maxDepth,depth):
 		# Basic Bone Extensions				
-		parentCAT.AddArbBone()
-		
+		parentCAT.AddArbBone()		
 		currentARB = parentCAT.NumArbBones
-		lastNode = parentCAT.GetArbBone(currentARB)
-		dr = "$'{}'.name = \"{}\"".format(lastNode.node.name,c.name)
-		self.delayedRename.append(dr)		
-		
-		
+		lastNode = parentCAT.GetArbBone(currentARB)		
+		self.delayedRename.append("$'{}'.name = \"{}\"".format(lastNode.node.name,c.name))					
 		self.addFlatBones(c,lastNode)
 		self.createTempTransform(c,lastNode.node)								
 		boneLen = self.boneLength(c,5)
@@ -743,6 +739,8 @@ class Skeleton2CAT:
 			lastNode.node.width -= ((lastNode.node.width*self.taperFactors)* perc)
 			lastNode.node.depth -= ((lastNode.node.depth*self.taperFactors)* perc)
 		# Parse the Children	
+		
+
 		self.parseHierarchy(c,lastNode,exclude,maxDepth,depth+1)							
 
 	def initializeArmLimb(self,parentCAT,c):
