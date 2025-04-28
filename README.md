@@ -1,4 +1,4 @@
-# Skeleton2CAT
+# Skeleton2CAT for 3DSMAX 2024-2026
 Converts basic skeleton heirarchy to 3dsmax CAT Rig
 Supports 3dsmax 2024 to Later
 
