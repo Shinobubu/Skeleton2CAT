@@ -9,8 +9,11 @@ Supports 3dsmax 2024 to Later
 
  
 # Installation:
-   Drag and Drop the  Installer_DragNDrop.ms to 3dsmax viewport
-   To create Shortcut Right click Tool bar and Click Customize, Go to "Tool Bars" Under Category Search for Shinobubu
+   Unzip to any folder or check out the repository. find the file **Installer_DragNDrop.ms**
+   Drag and Drop the **Installer_DragNDrop.ms** to 3dsmax viewport
+   
+   To create Shortcut Right click the Tool bar and Click Customize,
+   Go to "Tool Bars" Under Category Search for __Shinobubu__
    now drag and drop each icon to your desired tool bar location.
 
 # Instructions:
