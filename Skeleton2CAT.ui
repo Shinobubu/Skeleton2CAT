@@ -1,0 +1,591 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <author>Shinobubu</author>
+ <class>skeleton2CatDialog</class>
+ <widget class="QDialog" name="skeleton2CatDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>991</width>
+    <height>681</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Skeleton to CATrig</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="toolbarLayout">
+     <item>
+      <widget class="QToolButton" name="saveSettingsBtn">
+       <property name="text">
+        <string>Save Settings</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="loadSettingsBtn">
+       <property name="text">
+        <string>Load Settings</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="toolbarSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QToolButton" name="resetSettingsBtn">
+       <property name="text">
+        <string>Reset</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="mainTab">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <attribute name="title">
+       <string>Main</string>
+      </attribute>
+      <widget class="QWidget" name="formLayoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>10</y>
+         <width>261</width>
+         <height>241</height>
+        </rect>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <property name="verticalSpacing">
+         <number>1</number>
+        </property>
+        <item row="3" column="0">
+         <widget class="QCheckBox" name="CATBoxModeDisplayChk">
+          <property name="text">
+           <string>CAT Box Display Mode</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="lengthAxisLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Length Axis</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="taperfactorLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Taper Factor</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QCheckBox" name="moveBaseToCharacterChk">
+          <property name="toolTip">
+           <string>If the selected joint is not near origin this will move the Character base below the selected bone</string>
+          </property>
+          <property name="text">
+           <string>Move CAT Base</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QCheckBox" name="deleteOldBonesChk">
+          <property name="toolTip">
+           <string>After the operation delete the old bones. This is not recommended if you are not transfering the Skins to the CAT as it would break any skinned meshes associated with the old bones</string>
+          </property>
+          <property name="text">
+           <string>Delete Skeleton After</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QDoubleSpinBox" name="taperFactorsFlt">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="toolTip">
+           <string>A Multipilier, How much smaller sub bones get as they get nested deeper into the bone chian </string>
+          </property>
+          <property name="whatsThis">
+           <string/>
+          </property>
+          <property name="maximum">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>0.010000000000000</double>
+          </property>
+          <property name="stepType">
+           <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
+          </property>
+          <property name="value">
+           <double>0.250000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QComboBox" name="lengthAxisCmb">
+          <item>
+           <property name="text">
+            <string>X</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Z</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QCheckBox" name="attemptRepairChk">
+          <property name="toolTip">
+           <string>If your Forearm has the same name as your UpperArms</string>
+          </property>
+          <property name="whatsThis">
+           <string>If your Forearm has the same name as your UpperArms</string>
+          </property>
+          <property name="text">
+           <string>Attempt fixing misnamed Limbs</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QGroupBox" name="transferSkinGroup">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>280</y>
+         <width>291</width>
+         <height>111</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>Transfer Skins Settings</string>
+       </property>
+       <widget class="QWidget" name="gridLayoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>20</y>
+          <width>276</width>
+          <height>80</height>
+         </rect>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_4">
+         <item row="0" column="0">
+          <widget class="QLabel" name="thresholdLabel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Threshold</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QDoubleSpinBox" name="skinTransferThresholdflt">
+           <property name="toolTip">
+            <string>The sensitivity of bone matching</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QCheckBox" name="skinTransferMatchByName">
+           <property name="toolTip">
+            <string>By Default this matches bones based on matching positions in case your bones have bad names</string>
+           </property>
+           <property name="text">
+            <string>Match By Name</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+      <widget class="QCheckBox" name="moveSkinsToCATChk">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>260</y>
+         <width>134</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string>Any Skinned mesh associated with the bones will have their bones association moved to the CAT bones</string>
+       </property>
+       <property name="text">
+        <string>Transfer Skins to CAT</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="boneLabelsTab">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>967</width>
+        <height>555</height>
+       </size>
+      </property>
+      <attribute name="title">
+       <string>Bone Labels</string>
+      </attribute>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <property name="sizeConstraint">
+          <enum>QLayout::SetDefaultConstraint</enum>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QTableWidget" name="boneLabelTable">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+             <horstretch>1</horstretch>
+             <verstretch>1</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="alternatingRowColors">
+            <bool>true</bool>
+           </property>
+           <property name="sortingEnabled">
+            <bool>true</bool>
+           </property>
+           <property name="rowCount">
+            <number>50</number>
+           </property>
+           <property name="columnCount">
+            <number>14</number>
+           </property>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <row/>
+           <column>
+            <property name="text">
+             <string>Head</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Chest</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Neck</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Collar</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Upper Arm</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Fore Arm</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Thigh</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Calf</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Hand</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Finger</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Ankle</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Spine</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Tail</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Digi</string>
+            </property>
+           </column>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="boneSizeTab">
+      <attribute name="title">
+       <string>Bone Sizes</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QTableWidget" name="sizeTable">
+         <property name="inputMethodHints">
+          <set>Qt::ImhDigitsOnly|Qt::ImhFormattedNumbersOnly|Qt::ImhPreferNumbers</set>
+         </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="rowCount">
+          <number>8</number>
+         </property>
+         <property name="columnCount">
+          <number>3</number>
+         </property>
+         <row>
+          <property name="text">
+           <string>Head</string>
+          </property>
+         </row>
+         <row>
+          <property name="text">
+           <string>Chest</string>
+          </property>
+         </row>
+         <row>
+          <property name="text">
+           <string>Hip</string>
+          </property>
+         </row>
+         <row>
+          <property name="text">
+           <string>Foot</string>
+          </property>
+         </row>
+         <row>
+          <property name="text">
+           <string>Spine</string>
+          </property>
+         </row>
+         <row>
+          <property name="text">
+           <string>Leg</string>
+          </property>
+         </row>
+         <row>
+          <property name="text">
+           <string>Arm</string>
+          </property>
+         </row>
+         <row>
+          <property name="text">
+           <string>Tail</string>
+          </property>
+         </row>
+         <column>
+          <property name="text">
+           <string>Length</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Width</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Height</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="widget" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+       <horstretch>1</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="applyBtn">
+        <property name="text">
+         <string>Apply</string>
+        </property>
+        <property name="default">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="cancelBtn">
+        <property name="text">
+         <string>Cancel</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <includes>
+  <include location="local">closeDialog</include>
+  <include location="local">applySettings</include>
+ </includes>
+ <resources/>
+ <connections/>
+</ui>
