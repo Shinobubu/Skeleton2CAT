@@ -47,3 +47,12 @@ For best results make sure the skeleton is using names commonly used by CATrig
 Use the preset of bone names associated with limbs
 
 ![3dsmax_sUMEs7nmw5](https://github.com/user-attachments/assets/0dd107eb-c8b0-49db-b0ce-ac97ab42fad6)
+
+# Trouble Shooting
+Go to Bind Pose
+
+CAT Rig's have very sticky IK/FK (Even with the FK value set to 1) algorithms and it may look broken on the first attempt at returning to Bind Pose. 
+
+__Solution:__
+      
+      Repeatedly using the function will eventually bring the bones back to its bind pose. 
