@@ -98,6 +98,8 @@ class Skeleton2CAT:
 	def createPoint(self,p1,p2,p3):
 		rt.point3(p1,p2,p3)
 
+	
+		
 	def boneDistanceFromBone(self,boneA,boneB):
 		startPos = boneA.position
 		endPos = boneB.position
@@ -109,13 +111,43 @@ class Skeleton2CAT:
 		if len(bone.Children) == 0: 
 			return defaultlength
 		boneB = bone.Children[0]
-		startPos = bone.position
-		endPos = boneB.position
+		try:
+			startPos = bone.position
+			endPos = boneB.position
+		except:
+			startPos = bone.transform.position
+			endPos = boneB.transform.position
 		p1 = rt.point3(startPos[0],startPos[1],startPos[2])	
 		p2 = rt.point3(endPos[0],endPos[1],endPos[2])
 		result = rt.distance(p1,p2)
 		if result <= 0.01:
 			result = defaultlength
+
+		return result
+	
+	def boneLengthFromMatrix(self,bone,boneDictionary):
+		''' Uses a set to find the child'''		
+		if len(bone.Children) == 0: 					
+			return -1		
+		try:
+			#idname = id(bone.Children[0].transform)			
+			boneB = boneDictionary[ bone.Children[0].name ] 
+			boneA = boneDictionary[ bone.name ] 									
+		except:
+			return -1
+			
+		try:
+			startPos = boneA.position
+			endPos = boneB.position
+		except:
+			startPos = boneA.transform.position
+			endPos = boneB.transform.position
+
+		p1 = rt.point3(startPos[0],startPos[1],startPos[2])	
+		p2 = rt.point3(endPos[0],endPos[1],endPos[2])
+		result = rt.distance(p1,p2)
+		if result <= 0.01:
+			result = -1 # has no parent or too small
 
 		return result
 
@@ -326,13 +358,10 @@ class Skeleton2CAT:
 
 		# disable IK/FK to allow leg to reposition
 		#legCAT.removeIKTarget()
-		if hasAnkles:
-			legCAT.layerIKFKRatio = 1.0			
-			dummy = rt.Dummy()
-			dummy.transform = foot.transform
-			dummy.rotation = self.platformRotation
-			legCAT.IKtarget.transform = dummy.transform
-			rt.delete(dummy)
+		legCAT.layerIKFKRatio = 1.0	
+		RepeatPosition=[]
+		
+		
 		
 		if hasAnkles:			
 			footCAT = legCAT.Palm
@@ -345,7 +374,7 @@ class Skeleton2CAT:
 			calfCAT = legCAT.bones[1]
 			calfCAT.numSegs = numCalfSegments
 			calfCAT.width = self.legSizes[1]
-			calfCAT.depth = self.legSizes[2]
+			calfCAT.depth = self.legSizes[2]			
 
 		if hasDigis:
 			digiCAT = legCAT.bones[2]
@@ -357,6 +386,7 @@ class Skeleton2CAT:
 		if hasCollar:
 			collarCAT = legCAT.collarbone
 			collarCAT.node.length = self.boneLength(collarbones)
+			RepeatPosition.append([collarbones,collarCAT.node])
 			self.addFlatBones(collarbones,collarCAT)
 			self.createTempTransform(collarbones,collarCAT.node)						
 			collarnodesthesame = collarCAT.node.Controller == collarCAT			
@@ -388,6 +418,7 @@ class Skeleton2CAT:
 			thighCAT.boneSegs[se].node.name = thighs[se].name						
 			self.addFlatBones(thighs[se],thighCAT.boneSegs[se])			
 			self.createTempTransform(thighs[se],thighCAT.boneSegs[se].node )
+			RepeatPosition.append([thighs[se],thighCAT.boneSegs[se].node ])
 			self.parseHierarchy(thighs[se],thighCAT.boneSegs[se],exclude+selfbones,maxDepth,depth+1)			
 			
 									
@@ -395,12 +426,14 @@ class Skeleton2CAT:
 			calfCAT.boneSegs[se].node.name = calfs[se].name
 			self.addFlatBones(calfs[se],calfCAT.boneSegs[se])			
 			self.createTempTransform(calfs[se],calfCAT.boneSegs[se].node )
+			RepeatPosition.append([calfs[se],calfCAT.boneSegs[se].node])
 			self.parseHierarchy(calfs[se],calfCAT.boneSegs[se],exclude+selfbones,maxDepth,depth+1)
 
 		for se in range(numDigiSegments):
 			digiCAT.boneSegs[se].node.name = digis[se].name
 			self.addFlatBones(digis[se],digiCAT.boneSegs[se])
 			self.createTempTransform(digis[se],digiCAT.boneSegs[se].node )
+			RepeatPosition.append([digis[se],digiCAT.boneSegs[se].node])
 			self.parseHierarchy(digis[se],digiCAT.boneSegs[se],exclude+selfbones,maxDepth,depth+1)
 
 		#do this last while the joints articulate into final position
@@ -409,7 +442,8 @@ class Skeleton2CAT:
 		thighCAT.width = self.legSizes[1]
 		thighCAT.depth = self.legSizes[2]
 
-		self.addFlatBones(thighs[0],thighCAT)		
+		#self.addFlatBones(thighs[0],thighCAT)
+		#RepeatPosition.append([digis[se],digiCAT.boneSegs[se].node])		
 		self.createTempTransform(thighs[0],thighCAT.node)
 
 		
@@ -423,7 +457,7 @@ class Skeleton2CAT:
 			footCAT.node.height = self.footSizes[2]
 			footCAT.node.length = self.boneLength(foot,self.footSizes[0])
 			
-						
+			RepeatPosition.append([foot,footCAT.node])				
 			self.addFlatBones(foot,footCAT)
 			self.createTempTransform(foot,footCAT.node)
 			#parse toes
@@ -433,6 +467,7 @@ class Skeleton2CAT:
 
 			if numDigits > 0:
 				# futile to try to get the fingers the normal way
+				
 				for fi in range(numDigits):					
 					footCAT.node.controller.digits[fi].NumBones = len(footDigits[fi])
 					fingerData = footCAT.node.controller.digits[fi]
@@ -442,18 +477,45 @@ class Skeleton2CAT:
 						fingerData.bones[nu].node.transform = footDigits[fi][nu].transform						
 						fingerData.bones[nu].name = footDigits[fi][nu].name										
 						self.addFlatBones(footDigits[fi][nu],fingerData.bones[nu])							
+						RepeatPosition.append([footDigits[fi][nu],fingerData.bones[nu].node])		
 						self.parseHierarchy(footDigits[fi][nu],fingerData.bones[nu],exclude+selfbones,maxDepth,depth+1)
-					
+
+			
+			
 			#parse extra attached bones not fingers, exclude leg bones detected			
 			self.parseHierarchy(foot,footCAT,exclude+selfbones,maxDepth,depth+1)
 		
-		self.moveIKTargetToEndOfLimb(legCAT,1) # undocumented feature 0.0 - 1.0 is the range to move				
-		legCAT.layerIKFKRatio = 0.0
+		
+		#fix rotation of IK platform			
+		self.correctPlatformPosition(legCAT,False)		
+		legCAT.layerIKFKRatio = 0.0		
+		# repeat positions to bake the IK
+		# in reverse forward and backward fix
+		for i in reversed(RepeatPosition):
+			i[1].transform = i[0].transform
+		for i in RepeatPosition:
+			i[1].transform = i[0].transform	
+			
+			
 		
 
-	def moveIKTargetToEndOfLimb(self,CatBone,val):
+	def moveIKTargetToEndOfLimb(self,CatBone,val,boneDictionary=None):
 		# Todo
-		CatBone.moveIKTargetToEndOfLimb(val) # undocumented feature 0.0 - 1.0 is the range to move				
+		dummy = rt.Dummy()	
+		palmCAT = CatBone.Palm	
+		if boneDictionary == None:				
+			ikposition = palmCAT.node.transform.position			
+			dummy.transform = palmCAT.node.transform		
+		else:
+			node = boneDictionary[palmCAT.node.name]				
+			ikposition = node.position			
+					
+
+		dummy.position = ikposition
+		CatBone.IKtarget.transform = dummy.transform				
+		rt.delete(dummy)
+
+		#CatBone.moveIKTargetToEndOfLimb(val) # undocumented feature 0.0 - 1.0 is the range to move				
 
 	def parseArmJoints(self,armCAT,parentCAT,c,exclude,maxDepth,depth):		
 		collarbones,upperarms,forearms,hand,handDigits,bones = self.getArmJoints(c)				
@@ -934,53 +996,136 @@ class Skeleton2CAT:
 				
 		return transformmatrixes
 	
-	def gotoBindPose(self,mesh,matrixArray):
-		#need to disable CATrig from twisting my joints
+	def CATGotoBindPose(self,mesh,skin_modifier,matrixArray):
 		ikHandles = [] # array of ik controllers
 		ikBlendStates = [] # array of blend states
 		ikSpineHandles = [] # array of spine controllers
 		ikSpineStates = [] # array of spine spinecontroller booleans
-		print("Going to bind pose looking for IK handles\n")
+		boneDictionary= dict()
+		boneOldNames = []
+		bones = list(rt.skinOps.GetBoneNodes(skin_modifier))
+		rootbone = None 
+		for b in bones:
+			if b.parent not in bones:
+				rootbone = b		
+		sortedlist = self.getSegmentJoints(rootbone,[],[])
+		
+		cleanedlist = []
+		sortedMatrix = []
+		for i in sortedlist:
+			try:
+				index = bones.index(i)
+				if index > -1:
+					cleanedlist.append(bones[index])
+					sortedMatrix.append(matrixArray[index])
+			except:
+				pass
+
+		bones = cleanedlist
+		matrixArray = sortedMatrix		
+
+		CATlengths = [] # sometimes if you can accidentally stretch the bones causing problems
+		
+		for b in range(len(bones)):
+			boneOldNames.append(bones[b].name)
+			# solving duplicate names
+			bones[b].name = f"{b}_"+rt.uniquename(bones[b].name)					
+			#print(f"{b} New name = {bones[b].name}\n")
+			boneDictionary[ bones[b].name ] = matrixArray[b]
+
+		
+		for b in range(len(bones)):																		
+			bonelength = self.boneLengthFromMatrix(bones[b],boneDictionary)											
+			CATlengths.append( bonelength ) 
+
+			try:						
+				ikTarget = bones[b].Controller.LimbData.IKtarget						
+				if ikTarget:													
+					ikController =  bones[b].Controller.Limb # bones[b].Controller.LimbData
+					
+					if ikController not in ikHandles:
+						ikHandles.append(ikController)
+						ikBlendStates.append(ikController.layerIKFKRatio)
+						ikController.layerIKFKRatio = 1.0							
+			except:
+				pass
+			try:												
+				ikSpine = bones[b].Controller.CATSpineData2						
+				if ikSpine:							
+					spineController = bones[b].Controller.CATSpineData2							
+					if spineController not in ikSpineHandles:
+						ikSpineHandles.append(spineController)
+						ikSpineStates.append( self.disableSpineIK(spineController,True) )																
+			except:
+				pass
+		# sort the limbs out
+						
+		for b in (range(len(bones))):
+			bones[b].transform = matrixArray[b]
+			if CATlengths[b] > -1:
+				bones[b].length = CATlengths[b]						
+		
+
+		for i in range(len(ikSpineHandles)):					
+			self.disableSpineIK(ikSpineHandles[i],ikSpineStates[i])
+
+		# restore ik's
+		for i in range(len(ikHandles)):										
+			if ikHandles[i].isLeg:
+				self.correctPlatformPosition(ikHandles[i],False,boneDictionary)					
+				ikHandles[i].layerIKFKRatio = ikBlendStates[i]		
+		
+				
+			
+		
+		# Always start in reverse
+		for b in reversed(range(len(bones))):			
+			if CATlengths[b] > -1:
+				bones[b].length = CATlengths[b]			
+			bones[b].transform = matrixArray[b]			
+		for b in (range(len(bones))):			
+			bones[b].transform = matrixArray[b]							
+			if CATlengths[b] > -1:
+				bones[b].length = CATlengths[b]			
+
+				
+		for i in range(len(ikHandles)):										
+			if not ikHandles[i].isLeg:				
+				self.moveIKTargetToEndOfLimb(ikHandles[i],1,boneDictionary)
+				ikHandles[i].layerIKFKRatio = ikBlendStates[i]	
+				
+
+		for b in range(len(bones)):
+			bones[b].name = boneOldNames[b]
+		
+
+		
+
+
+	def gotoBindPose(self,mesh,matrixArray):
+		#need to disable CATrig from twisting my joints
+		
 		for x in mesh.modifiers:
-			if str(x) == "Skin:Skin":					
+			if str(x) == "Skin:Skin":									
+				hasCAT = False				
 				skin_modifier = x								
-				bones = rt.skinOps.GetBoneNodes(skin_modifier)	
+				bones = rt.skinOps.GetBoneNodes(skin_modifier)									
 				#first find bones that are spines
 				for b in range(len(bones)):	
 					try:
-						
-						ikTarget = bones[b].Controller.LimbData.IKtarget						
-						if ikTarget:													
-							ikController =  bones[b].Controller.LimbData
-							
-							if ikController not in ikHandles:
-								ikHandles.append(ikController)
-								ikBlendStates.append(ikController.layerIKFKRatio)
-								ikController.layerIKFKRatio = 1.0							
+						if bones[b].Controller.CATParent :						
+							hasCAT = True							
 					except:
 						pass
-					try:
-												
-						ikSpine = bones[b].Controller.CATSpineData2						
-						if ikSpine:							
-							spineController = bones[b].Controller.CATSpineData2							
-							if spineController not in ikSpineHandles:
-								ikSpineHandles.append(spineController)
-								ikSpineStates.append( self.disableSpineIK(spineController,True) )
-								
-					except:
-						pass
-						
-				for b in range(len(bones)):					
-					bones[b].transform = matrixArray[b]	
-
-				# restore ik's
-				for i in range(len(ikHandles)):
-					ikHandles[i].layerIKFKRatio = ikBlendStates[i]					
-					self.moveIKTargetToEndOfLimb(ikHandles[i],1)
-				for i in range(len(ikSpineHandles)):					
-					self.disableSpineIK(ikSpineHandles[i],ikSpineStates[i])
-
+					if hasCAT:
+						self.CATGotoBindPose(mesh,skin_modifier,matrixArray)
+						break;
+					
+					
+				for b in range(len(bones)):																
+					bones[b].transform = matrixArray[b]																		
+															
+				
 	
 	def disableSpineIK(self,spineCAT,toggle):
 		oldState = spineCAT.SpineFK		
@@ -989,21 +1134,100 @@ class Skeleton2CAT:
 		rt.Execute("SetQuietMode Off")		
 		return oldState
 	
-	def setupStaticMatrix(self,sourceBones,targetCAT):
-		for b in range(len(targetCAT)):
-			controller = targetCAT[b].Controller
-			boneName = sourceBones[b].name
-			oldTM = controller.SetupTM
-			newTM = targetCAT[b].transform
-			#print(f"{boneName} == STM {oldTM.position} {oldTM.rotation} M {newTM.position} {newTM.rotation} \n")			
-			#controller.SetupTM = sourceBones[b].transform
+	
+	def getCombinedBoundingBox(self,objects):
+		"""
+		Calculates the combined bounding box of an array of objects.
+
+		Args:
+			objects: A list of 3ds Max nodes.
+
+		Returns:
+			A pymxs.runtime.Box3 object representing the combined bounding box, or None if the array is empty.
+		"""
+		if not objects:
+			return None
+
+		first_box = rt.nodeGetBoundingBox(objects[0] , objects[0].transform, asBox3=True)
+		min_point = first_box.min
+		max_point = first_box.max
+
+		for obj in objects[1:]:
+			box = pymxs.runtime.nodeGetBoundingBox(obj, obj.transform, asBox3=True)
+			min_point.x = min(min_point.x, box.min.x)
+			min_point.y = min(min_point.y, box.min.y)
+			min_point.z = min(min_point.z, box.min.z)
+
+			max_point.x = max(max_point.x, box.max.x)
+			max_point.y = max(max_point.y, box.max.y)
+			max_point.z = max(max_point.z, box.max.z)
+		return rt.Box3(min_point, max_point)
+
+	def correctPlatformPosition(self,legCAT,offsetToToes=False,boneDictionary=None):		
+		footCAT = legCAT.Palm	
+		footlen = self.boneLength(footCAT.node,self.footSizes[0])	
+		#fix rotation of IK platform and offset to the base of the palm/foot
+		offset = 0
+		if offsetToToes:
+			numDigits = footCAT.node.controller.numDigits
+			fingerGroup = [footCAT.node]
+			if numDigits > 0:			
+				for fi in range(numDigits):
+					knuckles = footCAT.node.controller.digits[fi].NumBones
+					fingerData = footCAT.node.controller.digits[fi]
+					for nu in range(knuckles):
+						fingerGroup.append(fingerData.bones[nu].node)									
+			bb = self.getCombinedBoundingBox(fingerGroup)
+				
+			if self.lengthAxis == "X":				
+				forwardpoint = rt.point3( footlen , 0 , 0 ) * footCAT.node.transform.rotation
+			if self.lengthAxis == "Z":				
+				forwardpoint = rt.point3( 0 , footlen , 0 ) * footCAT.node.transform.rotation			
+			ikposition = (footCAT.node.transform.position + forwardpoint)
+			ikposition.z = bb.min.z
+			
+
+		else:
+			#project to floor	
+			if boneDictionary == None:
+				if self.lengthAxis == "X":				
+					forwardpoint = rt.point3( footlen, 0 , 0 ) * footCAT.node.transform.rotation
+				if self.lengthAxis == "Z":				
+					forwardpoint = rt.point3( 0 , footlen , 0 ) * footCAT.node.transform.rotation				
+				ikposition = footCAT.node.transform.position + forwardpoint
+			else :				
+				node = boneDictionary[footCAT.node.name]				
+				footlen = self.footSizes[0]
+				footlenfound = self.boneLengthFromMatrix(footCAT.node,boneDictionary)	
+				if footlenfound > -1:
+					footlen = footlenfound
+
+				if self.lengthAxis == "X":				
+					forwardpoint = rt.point3( footlen, 0 , 0 ) * node.rotation
+				if self.lengthAxis == "Z":				
+					forwardpoint = rt.point3( 0 , footlen , 0 ) * node.rotation				
+				ikposition = node.position + forwardpoint
+			ikposition.z = 0
+
 		
-		
+		dummy = rt.Dummy()		
+		dummy.transform = footCAT.node.transform
+		dummy.rotation = self.platformRotation
+		dummy.position = ikposition
+		legCAT.IKtarget.transform = dummy.transform				
+		rt.delete(dummy)
+
 	def selectReturnToBindPose(self):		
 		with pymxs.undo(True):				
 			numselected = len(rt.getCurrentSelection())		
 			selectedRootBone = None
 			self.skinnedObjects = []
+			
+			if(self.lengthAxis == "X"):
+				self.platformRotation = rt.EulerAngles(180,-90,0)				
+			if(self.lengthAxis == "Z"):	
+				self.platformRotation = rt.EulerAngles(180,0,0)							
+			
 			for s in range(numselected):
 				mesh = rt.getCurrentSelection()[s]
 				pose = self.getBindPose(mesh)
@@ -1041,6 +1265,8 @@ class Skeleton2CAT:
 				# grab parent bone and copy position and rotation	
 
 				#TODO: this isn't setup yet for Y up		
+				#self.platformRotation = rt.EulerAngles(180,-90,0)
+				
 				if(self.lengthAxis == "X"):
 					self.platformRotation = rt.EulerAngles(180,-90,0)
 					CATParentObj.rotation = self.platformRotation
@@ -1048,14 +1274,17 @@ class Skeleton2CAT:
 						newPos = selectedRootBone.position
 						newPos.z = 0
 						CATParentObj.position = newPos
+					CATParentObj.rotation = self.platformRotation
 				
 				if(self.lengthAxis == "Z"):	
-					self.platformRotation = rt.EulerAngles(180,90,0)							
+					self.platformRotation = rt.EulerAngles(180,0,0)							
 					CATParentObj.rotation = self.platformRotation
 					if self.moveBaseToCharacter:				
 						newPos = selectedRootBone.position
-						newPos.x = 0
+						#newPos.x = 0
+						newPos.z = 0
 						CATParentObj.position = newPos
+					
 								
 				CATParentObj.AddHub()
 				pelvisHUB = CATParentObj.RootHub #HubTrans	
@@ -1077,9 +1306,7 @@ class Skeleton2CAT:
 					except:
 						print(f"Unable to Rename [{d}] possible scene naming conflicts\n")
 
-				self.skinnedObjects = self.get_skinned_meshes(self.flatBoneList)
-				#self.validateBonePositions(self.flatBoneList,self.flatCATBones)
-				self.setupStaticMatrix(self.flatBoneList,self.flatCATBones)
+				self.skinnedObjects = self.get_skinned_meshes(self.flatBoneList)				
 
 				if self.moveSkinsToCAT:										
 					for m in range(len(self.skinnedObjects)):
