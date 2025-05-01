@@ -24,6 +24,9 @@ Supports 3dsmax 2024 to Later
    To create Shortcut Right click the Tool bar and Click Customize,
    Go to "Tool Bars" Under Category Search for __Shinobubu__
    now drag and drop each icon to your desired tool bar location.
+   
+# Updating:
+  The same process as installation. The installer would over write the old scripts.
 
 # Toolbar Icons:
 ![Icon_SK2CAT](https://github.com/user-attachments/assets/fffe25a4-9fce-44d9-87e3-3d9f0952664f)![Icon_SK2CAT_gotobindpose](https://github.com/user-attachments/assets/8ac8119f-f29b-40be-9723-4d358c4cc903)
