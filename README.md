@@ -54,8 +54,11 @@ Use the preset of bone names associated with limbs
 # Trouble Shooting
 Go to Bind Pose
 
-CAT Rig's have very sticky IK/FK (Even with the FK value set to 1) algorithms and it may look broken on the first attempt at returning to Bind Pose. 
+My original CATRigged model would explode when I attempt to return to bind pose.
+
+CAT Rig's are adjustable after skinning and this feature can easily corrupt the binding pose of a model.
 
 __Solution:__
       
-      Repeatedly using the function will eventually bring the bones back to its bind pose. 
+      Export the original  3dsmax scene to FBX and import it from the FBX file to cleanup skinning anomolies 
+      and then regenerate the CATrig by converting the imported bones.
