@@ -25,7 +25,7 @@ class Skeleton2CAT:
 		self.fingerNames = ["digit","hoof","finger","thumb","index","middle","ring","hallux"]
 		self.ankleNames = ["ankle","feet","foot","manus","prima"]
 		self.spineNames = ["spine"]
-		self.tailNames = ["tail"]
+		self.tailNames = ["tail","tentacle","tendril"]
 		self.neckNames = ["neck"]
 		self.taperFactors = 0.25
 		self.hipSizes = [3,10,5]
@@ -61,9 +61,9 @@ class Skeleton2CAT:
 		
 
 	def maxHierarchyDepth(self,parentObject,depth=0):
-		result = depth
+		result = depth				
 		for c in parentObject.Children:	
-			childrenLen = len(c.Children) 
+			childrenLen = len(c.Children) 					
 			if childrenLen > 0:
 				rs = self.maxHierarchyDepth(c,depth+1) 
 				if rs > result:
@@ -446,10 +446,6 @@ class Skeleton2CAT:
 		#RepeatPosition.append([digis[se],digiCAT.boneSegs[se].node])		
 		self.createTempTransform(thighs[0],thighCAT.node)
 
-		
-		
-
-
 		if hasAnkles:		
 			footCAT.name = ""	
 			footCAT.node.name = foot.name				
@@ -475,7 +471,8 @@ class Skeleton2CAT:
 					#knuckle indexing, this also calls parseHiearchy to create custom user added bones on each knuckle because why not
 					for nu in range(len(footDigits[fi])):						
 						fingerData.bones[nu].node.transform = footDigits[fi][nu].transform						
-						fingerData.bones[nu].name = footDigits[fi][nu].name										
+						fingerData.bones[nu].name = footDigits[fi][nu].name		
+						fingerData.bones[nu].length = self.boneLength(footDigits[fi][nu],5)
 						self.addFlatBones(footDigits[fi][nu],fingerData.bones[nu])							
 						RepeatPosition.append([footDigits[fi][nu],fingerData.bones[nu].node])		
 						self.parseHierarchy(footDigits[fi][nu],fingerData.bones[nu],exclude+selfbones,maxDepth,depth+1)
@@ -658,7 +655,8 @@ class Skeleton2CAT:
 					fingerData.name = "" # erase prefix to preserve name
 					for nu in range(len(handDigits[fi])):						
 						fingerData.bones[nu].node.transform = handDigits[fi][nu].transform									
-						fingerData.bones[nu].name = handDigits[fi][nu].name		
+						fingerData.bones[nu].name = handDigits[fi][nu].name								
+						fingerData.bones[nu].length = self.boneLength(handDigits[fi][nu],5)						
 						self.addFlatBones(handDigits[fi][nu],fingerData.bones[nu])				
 						self.parseHierarchy(handDigits[fi][nu],fingerData.bones[nu],exclude+selfbones,maxDepth,depth+1)						
 
@@ -828,7 +826,7 @@ class Skeleton2CAT:
 			isLeg = False
 			isArm = False			
 			# find leg conditions and rare conditions of collarbones with legs
-			#If Child is Leg or Arm CollarBone
+			#If Child is Leg or Arm CollarBone			
 			thighName = self.findKeyword(c.name.lower(),self.thighNames)
 			armName = self.findKeyword(c.name.lower(),self.upperarmNames)
 			childhasThighs = self.childHasLegs(c)
@@ -1236,9 +1234,8 @@ class Skeleton2CAT:
 	def validateBonePositions(self,flatSource,flattarget):
 		for i in range(len(flatSource)):
 			bonename = flatSource[i].name
-			closeness = self.isBoneTheSame(flatSource[i],flattarget[i])
-			
-		
+			closeness = self.isBoneTheSame(flatSource[i],flattarget[i])	
+
 	def create_CAT_from_Bones(self):		
 
 		#with pymxs.undo(True):						
@@ -1295,7 +1292,7 @@ class Skeleton2CAT:
 				rootNode = arraynodes[1]
 				rootNode.name = rootname		
 				maxDepth = self.maxHierarchyDepth(selectedRootBone,0)	
-
+				print(f"Class of hub is {rt.classof(pelvisHUB)}\n")
 				self.addFlatBones(selectedRootBone,pelvisHUB)				
 				self.createTempTransform(selectedRootBone,rootNode)				
 				self.parseHierarchy(selectedRootBone,pelvisHUB,[],maxDepth)				
