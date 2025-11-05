@@ -47,6 +47,7 @@ class Skeleton2CAT:
 	
 		self.flatBoneList = []
 		self.flatCATBones = []
+		self.flatPlatformsIKs = []
 		self.positionDistanceMatch = 0.0001	
 		self.skinTransferThreshold = 1
 		self.skinTransferMatchByName = False
@@ -484,7 +485,8 @@ class Skeleton2CAT:
 		
 		
 		#fix rotation of IK platform			
-		self.correctPlatformPosition(legCAT,False)		
+		self.correctPlatformPosition(legCAT,False)	
+		self.flatPlatformsIKs.append(legCAT.IKtarget)	
 		legCAT.layerIKFKRatio = 0.0		
 		# repeat positions to bake the IK
 		# in reverse forward and backward fix
@@ -509,7 +511,8 @@ class Skeleton2CAT:
 					
 
 		dummy.position = ikposition
-		CatBone.IKtarget.transform = dummy.transform				
+		CatBone.IKtarget.transform = dummy.transform	
+		self.flatPlatformsIKs.append(CatBone.IKtarget)			
 		rt.delete(dummy)
 
 		#CatBone.moveIKTargetToEndOfLimb(val) # undocumented feature 0.0 - 1.0 is the range to move				
@@ -1290,13 +1293,31 @@ class Skeleton2CAT:
 				pelvisHUB.node.height = self.hipSizes[2]			
 				arraynodes = CATParentObj.CATRigNodes
 				rootNode = arraynodes[1]
-				rootNode.name = rootname		
+				rootNode.name = rootname						
 				maxDepth = self.maxHierarchyDepth(selectedRootBone,0)	
 				print(f"Class of hub is {rt.classof(pelvisHUB)}\n")
 				self.addFlatBones(selectedRootBone,pelvisHUB)				
 				self.createTempTransform(selectedRootBone,rootNode)				
 				self.parseHierarchy(selectedRootBone,pelvisHUB,[],maxDepth)				
 				
+				# copy layers
+				print("Assigning Layers to CAT Bones\n")
+				for bindex in range(len(self.flatBoneList)):					
+					layer = self.flatBoneList[bindex].layer
+					layer.addNode(self.flatCATBones[bindex])
+					layer.addNode(CATParentObj)
+					for ik in self.flatPlatformsIKs:
+						layer.addNode(ik)
+				# parent CAT root bone to original parent
+				originalParent = selectedRootBone.parent
+				if originalParent != None:
+					self.flatCATBones[0].parent = originalParent				
+					CATParentObj.parent = originalParent
+					CATParentObj.name = rt.uniquename(originalParent.name)
+					for ik in self.flatPlatformsIKs:
+						ik.parent = originalParent
+
+
 				for d in self.delayedRename:					
 					try:
 						rt.execute(d)
@@ -1304,11 +1325,14 @@ class Skeleton2CAT:
 						print(f"Unable to Rename [{d}] possible scene naming conflicts\n")
 
 				self.skinnedObjects = self.get_skinned_meshes(self.flatBoneList)				
+				
 
 				if self.moveSkinsToCAT:										
 					for m in range(len(self.skinnedObjects)):
 						print(f" Transfering Skinning to {self.skinnedObjects[m].name}\n")
 						self.transferBones(self.skinnedObjects[m],self.flatBoneList,self.flatCATBones)
+				
+					
 
 				if self.deleteOldBones: 
 					if(len(self.skinnedObjects) > 0 ):
