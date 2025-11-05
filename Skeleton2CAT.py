@@ -1250,7 +1250,7 @@ class Skeleton2CAT:
 			selectedRootBone = None
 			self.skinnedObjects = []
 			for s in range(numselected):
-				if rt.classof( rt.getCurrentSelection()[s] ) == pymxs.runtime.Dummy:
+				if rt.classof( rt.getCurrentSelection()[s] ) == pymxs.runtime.Dummy or rt.classof( rt.getCurrentSelection()[s] ) == pymxs.runtime.BoneGeometry :
 					selectedRootBone = rt.getCurrentSelection()[s]
 
 			if selectedRootBone != None:
