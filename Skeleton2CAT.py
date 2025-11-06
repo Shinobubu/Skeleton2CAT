@@ -1250,7 +1250,7 @@ class Skeleton2CAT:
 		if True:
 			self.flatBoneList = []
 			self.flatCATBones = []
-			
+			self.delayedRename = []
 			numselected = len(rt.getCurrentSelection())		
 			selectedRootBone = None
 			self.skinnedObjects = []
