@@ -830,9 +830,7 @@ class Skeleton2CAT:
 			if c in exclude:	
 				#print(f"{parentObject.name} Excluding {c.name}")			
 				continue
-			if pymxs.runtime.classof(parentCAT) != pymxs.runtime.HubTrans:
-				print(f"ERROR PARENT CAT is invalid something bad happened  {c.name} type {pymxs.runtime.classof(parentCAT)}\n")
-				break
+			
 			isLeg = False
 			isArm = False			
 			# find leg conditions and rare conditions of collarbones with legs
