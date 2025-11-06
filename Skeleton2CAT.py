@@ -14,7 +14,7 @@ class Skeleton2CAT:
 	def __init__(self):		
 		# Names have to be LOWER CASE
 		self.headNames = ["head","hub"]
-		self.chestNames = ["ribcage","chest","hub","pelvis"]
+		self.chestNames = ["ribcage","chest","hub","pelvis","root"]
 		self.collarNames = ["scapula","collar"]
 		self.upperarmNames = ["upperarm","bicep","arm"]
 		self.forearmNames = ["forearm",]
@@ -25,7 +25,7 @@ class Skeleton2CAT:
 		self.fingerNames = ["digit","hoof","finger","thumb","index","middle","ring","hallux"]
 		self.ankleNames = ["ankle","feet","foot","manus","prima"]
 		self.spineNames = ["spine"]
-		self.tailNames = ["tail","tentacle","tendril"]
+		self.tailNames = ["tail","tentacle","tendril","ribbon","bun"]
 		self.neckNames = ["neck"]
 		self.taperFactors = 0.25
 		self.hipSizes = [3,10,5]
@@ -673,8 +673,13 @@ class Skeleton2CAT:
 		tailboneLen = len(tails)
 		if tailboneLen == 0:
 			return False
-		depth += tailboneLen			
-		parentCAT.AddTail(NumBones=tailboneLen)																						
+		depth += tailboneLen	
+		try:
+			parentCAT.AddTail(NumBones=tailboneLen)																						
+		except:
+			print(f"{tails[0].name} TAIL ERROR probably misnamed. Make sure Tail segments have the same names!\n")
+			return False
+			# some CAT rigs do not have tails enabled
 		CATTail = parentCAT.tails[-1]	
 		CATTail.name = "" # blank out to preserve tail names								
 		CATTail.width = self.tailSizes[1]	
@@ -825,7 +830,9 @@ class Skeleton2CAT:
 			if c in exclude:	
 				#print(f"{parentObject.name} Excluding {c.name}")			
 				continue
-			
+			if pymxs.runtime.classof(parentCAT) != pymxs.runtime.HubTrans:
+				print(f"ERROR PARENT CAT is invalid something bad happened  {c.name} type {pymxs.runtime.classof(parentCAT)}\n")
+				break
 			isLeg = False
 			isArm = False			
 			# find leg conditions and rare conditions of collarbones with legs
@@ -1300,22 +1307,7 @@ class Skeleton2CAT:
 				self.createTempTransform(selectedRootBone,rootNode)				
 				self.parseHierarchy(selectedRootBone,pelvisHUB,[],maxDepth)				
 				
-				# copy layers
-				print("Assigning Layers to CAT Bones\n")
-				for bindex in range(len(self.flatBoneList)):					
-					layer = self.flatBoneList[bindex].layer
-					layer.addNode(self.flatCATBones[bindex])
-					layer.addNode(CATParentObj)
-					for ik in self.flatPlatformsIKs:
-						layer.addNode(ik)
-				# parent CAT root bone to original parent
-				originalParent = selectedRootBone.parent
-				if originalParent != None:
-					self.flatCATBones[0].parent = originalParent				
-					CATParentObj.parent = originalParent
-					CATParentObj.name = rt.uniquename(originalParent.name)
-					for ik in self.flatPlatformsIKs:
-						ik.parent = originalParent
+				
 
 
 				for d in self.delayedRename:					
@@ -1332,7 +1324,22 @@ class Skeleton2CAT:
 						print(f" Transfering Skinning to {self.skinnedObjects[m].name}\n")
 						self.transferBones(self.skinnedObjects[m],self.flatBoneList,self.flatCATBones)
 				
-					
+				# copy layers
+				print("Assigning Layers to CAT Bones\n")
+				for bindex in range(len(self.flatBoneList)):					
+					layer = self.flatBoneList[bindex].layer
+					layer.addNode(self.flatCATBones[bindex])
+					layer.addNode(CATParentObj)
+					for ik in self.flatPlatformsIKs:
+						layer.addNode(ik)
+				# parent CAT root bone to original parent
+				originalParent = selectedRootBone.parent
+				if originalParent != None:
+					self.flatCATBones[0].parent = originalParent				
+					CATParentObj.parent = originalParent
+					CATParentObj.name = rt.uniquename(originalParent.name)
+					for ik in self.flatPlatformsIKs:
+						ik.parent = originalParent	
 
 				if self.deleteOldBones: 
 					if(len(self.skinnedObjects) > 0 ):
