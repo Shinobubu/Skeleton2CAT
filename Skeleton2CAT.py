@@ -676,24 +676,33 @@ class Skeleton2CAT:
 		depth += tailboneLen	
 		try:
 			parentCAT.AddTail(NumBones=tailboneLen)																						
-		except:
+		except Exception as e:
 			print(f"{tails[0].name} TAIL ERROR probably misnamed. Make sure Tail segments have the same names!\n")
+			print(f"Error caught: {e}")
 			return False
 			# some CAT rigs do not have tails enabled
 		CATTail = parentCAT.tails[-1]	
-		CATTail.name = "" # blank out to preserve tail names								
-		CATTail.width = self.tailSizes[1]	
+		totalLength = 0
+		for b in range(CATTail.numBones):
+			totalLength = totalLength + self.boneLength(tails[b])
+		CATTail.taper = 1.0
+		
+		
+		CATTail.width = self.tailSizes[1]			
 		CATTail.depth = self.tailSizes[2]
+		CATTail.name = "" # blank out to preserve tail names			
+		print(f"Tail total length {totalLength}")
 		for b in range(CATTail.numBones):
 			CATTail.bones[b].name = tails[b].name
-			CATTail.bones[b].node.name = tails[b].name					
+			CATTail.bones[b].node.name = tails[b].name							
 			segmentLength = self.boneLength(tails[b])
-			#Get bone lengths
-			CATTail.bones[b].node.length = segmentLength	
+			#Get bone lengths			
+			CATTail.bones[b].node.length = segmentLength				
 			self.addFlatBones(tails[b],CATTail.bones[b])																							
 			self.createTempTransform(tails[b],CATTail.bones[b].node)
 			if len(tails[b].Children) > 0:
 				self.parseHierarchy(tails[b],CATTail.bones[b],exclude+tails,maxDepth,depth+1)
+
 		return True
 
 	def parseNeck(self,parentCAT,c,exclude,maxDepth,depth):
@@ -804,6 +813,7 @@ class Skeleton2CAT:
 		
 		if maxDepth > 0:
 			perc = (float(depth) / float(maxDepth))
+			
 			lastNode.node.width -= ((lastNode.node.width*self.taperFactors)* perc)
 			lastNode.node.depth -= ((lastNode.node.depth*self.taperFactors)* perc)
 		# Parse the Children	
@@ -855,20 +865,27 @@ class Skeleton2CAT:
 			
 			#print(f"{parentObject.name} Child has thighs childhasArms {childhasArms} childhasThighs {childhasThighs} isSpine {isSpine} isNeck {isNeck}\n")
 			
-				
-			if isArm:			
-				armlimbs.append( self.initializeArmLimb(parentCAT,c) )								
-			elif isLeg:
-				legLimbs.append( self.initializeLegLimb(parentCAT,c) )				
-			elif isTail:
-				self.parseTail(parentCAT,c,exclude,maxDepth,depth)								
-			elif isNeck:				
-				self.parseNeck(parentCAT,c,exclude,maxDepth,depth)												
-			elif isSpine:
-				self.parseSpine(parentCAT,c,exclude,maxDepth,depth)	
-			else :
-				# this part is recursive too				
+			# only if we're a hub.	
+			
+			classname = rt.classof(parentCAT)			
+			if classname == "HubTrans":							
+				if isArm:			
+					armlimbs.append( self.initializeArmLimb(parentCAT,c) )								
+				elif isLeg:
+					legLimbs.append( self.initializeLegLimb(parentCAT,c) )				
+				elif isTail:
+					self.parseTail(parentCAT,c,exclude,maxDepth,depth)								
+				elif isNeck:				
+					self.parseNeck(parentCAT,c,exclude,maxDepth,depth)												
+				elif isSpine:
+					self.parseSpine(parentCAT,c,exclude,maxDepth,depth)	
+				else :
+					# this part is recursive too				
+					self.parseBone(parentCAT,c,exclude,maxDepth,depth)	
+			else:
 				self.parseBone(parentCAT,c,exclude,maxDepth,depth)	
+			
+				
 
 		# Process Limbs separately so they dont mirror		
 		for a in armlimbs:			
