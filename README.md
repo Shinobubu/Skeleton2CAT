@@ -26,7 +26,7 @@ Supports 3dsmax 2024 to Later
    now drag and drop each icon to your desired tool bar location.
    
 # Updating:
-  The same process as installation. The installer would over write the old scripts.
+  The same process as installation. The installer would over write the old scripts. Simply Drag and Drop the **Installer_DragNDrop.ms** from the updated folder to the 3dsmax viewport
 
 # Toolbar Icons:
 ![Icon_SK2CAT](https://github.com/user-attachments/assets/fffe25a4-9fce-44d9-87e3-3d9f0952664f)![Icon_SK2CAT_gotobindpose](https://github.com/user-attachments/assets/8ac8119f-f29b-40be-9723-4d358c4cc903)
