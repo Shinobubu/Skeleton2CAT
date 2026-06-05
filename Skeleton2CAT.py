@@ -867,8 +867,9 @@ class Skeleton2CAT:
 			
 			# only if we're a hub.	
 			
-			classname = rt.classof(parentCAT)			
-			if classname == "HubTrans":							
+			classname = str(rt.classof(parentCAT))				
+			if classname == "HubTrans":	
+			
 				if isArm:			
 					armlimbs.append( self.initializeArmLimb(parentCAT,c) )								
 				elif isLeg:
@@ -883,6 +884,7 @@ class Skeleton2CAT:
 					# this part is recursive too				
 					self.parseBone(parentCAT,c,exclude,maxDepth,depth)	
 			else:
+			
 				self.parseBone(parentCAT,c,exclude,maxDepth,depth)	
 			
 				
