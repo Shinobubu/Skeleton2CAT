@@ -805,7 +805,7 @@ class Skeleton2CAT:
 		parentCAT.AddArbBone()		
 		currentARB = parentCAT.NumArbBones
 		lastNode = parentCAT.GetArbBone(currentARB)		
-		self.delayedRename.append("$'{}'.name = \"{}\"".format(lastNode.node.name,c.name))					
+		self.delayedRename.append("$'{}'.name = \"{}\"".format(lastNode.node.name,c.name))				
 		self.addFlatBones(c,lastNode)
 		self.createTempTransform(c,lastNode.node)								
 		boneLen = self.boneLength(c,5)
@@ -816,9 +816,7 @@ class Skeleton2CAT:
 			
 			lastNode.node.width -= ((lastNode.node.width*self.taperFactors)* perc)
 			lastNode.node.depth -= ((lastNode.node.depth*self.taperFactors)* perc)
-		# Parse the Children	
-		
-
+		# Parse the Children			
 		self.parseHierarchy(c,lastNode,exclude,maxDepth,depth+1)							
 
 	def initializeArmLimb(self,parentCAT,c):
@@ -836,39 +834,39 @@ class Skeleton2CAT:
 		# Clavicle,Collar,etc	
 		armlimbs = []  # process limbs only after they are generated to avoid mirroring	
 		legLimbs = []
+		numChildren = len(parentObject.Children)
+		
 		for c in parentObject.Children:		
 			if c in exclude:	
 				#print(f"{parentObject.name} Excluding {c.name}")			
 				continue
-			
-			isLeg = False
-			isArm = False			
-			# find leg conditions and rare conditions of collarbones with legs
-			#If Child is Leg or Arm CollarBone			
-			thighName = self.findKeyword(c.name.lower(),self.thighNames)
-			armName = self.findKeyword(c.name.lower(),self.upperarmNames)
-			childhasThighs = self.childHasLegs(c)
-			childhasArms = self.childHasArms(c)
-			
-			if childhasThighs != "":
-				isLeg = True				
-			if thighName != "":
-				isLeg = True
-			
-			if childhasArms != "":
-				isArm = True
-			if armName != "":
-				isArm = True
-			isTail = self.inArrayStrings( self.tailNames , c.name )			
-			isNeck = self.inArrayStrings( self.neckNames , c.name )			
-			isSpine = self.inArrayStrings( self.spineNames, c.name)							
-			
-			#print(f"{parentObject.name} Child has thighs childhasArms {childhasArms} childhasThighs {childhasThighs} isSpine {isSpine} isNeck {isNeck}\n")
-			
+			if c in self.flatBoneList:				
+				continue
+							
 			# only if we're a hub.	
-			
 			classname = str(rt.classof(parentCAT))				
 			if classname == "HubTrans":	
+				isLeg = False
+				isArm = False			
+				# find leg conditions and rare conditions of collarbones with legs
+				#If Child is Leg or Arm CollarBone			
+				thighName = self.findKeyword(c.name.lower(),self.thighNames)
+				armName = self.findKeyword(c.name.lower(),self.upperarmNames)
+				childhasThighs = self.childHasLegs(c)
+				childhasArms = self.childHasArms(c)
+				
+				if childhasThighs != "":
+					isLeg = True				
+				if thighName != "":
+					isLeg = True
+				
+				if childhasArms != "":
+					isArm = True
+				if armName != "":
+					isArm = True
+				isTail = self.inArrayStrings( self.tailNames , c.name )			
+				isNeck = self.inArrayStrings( self.neckNames , c.name )			
+				isSpine = self.inArrayStrings( self.spineNames, c.name)							
 			
 				if isArm:			
 					armlimbs.append( self.initializeArmLimb(parentCAT,c) )								
