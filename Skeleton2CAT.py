@@ -391,7 +391,7 @@ class Skeleton2CAT:
 			self.addFlatBones(collarbones,collarCAT)
 			self.createTempTransform(collarbones,collarCAT.node)						
 			collarnodesthesame = collarCAT.node.Controller == collarCAT			
-			self.parseHierarchy(collarbones,parentCAT,exclude+selfbones,maxDepth,depth+1)
+			#self.parseHierarchy(collarbones,parentCAT,exclude+selfbones,maxDepth,depth+1)
 
 
 		legCAT.name = "" # Blank out to preserve names
@@ -420,7 +420,7 @@ class Skeleton2CAT:
 			self.addFlatBones(thighs[se],thighCAT.boneSegs[se])			
 			self.createTempTransform(thighs[se],thighCAT.boneSegs[se].node )
 			RepeatPosition.append([thighs[se],thighCAT.boneSegs[se].node ])
-			self.parseHierarchy(thighs[se],thighCAT.boneSegs[se],exclude+selfbones,maxDepth,depth+1)			
+			#self.parseHierarchy(thighs[se],thighCAT.boneSegs[se],exclude+selfbones,maxDepth,depth+1)			
 			
 									
 		for se in range(numCalfSegments):						
@@ -428,14 +428,14 @@ class Skeleton2CAT:
 			self.addFlatBones(calfs[se],calfCAT.boneSegs[se])			
 			self.createTempTransform(calfs[se],calfCAT.boneSegs[se].node )
 			RepeatPosition.append([calfs[se],calfCAT.boneSegs[se].node])
-			self.parseHierarchy(calfs[se],calfCAT.boneSegs[se],exclude+selfbones,maxDepth,depth+1)
+			#self.parseHierarchy(calfs[se],calfCAT.boneSegs[se],exclude+selfbones,maxDepth,depth+1)
 
 		for se in range(numDigiSegments):
 			digiCAT.boneSegs[se].node.name = digis[se].name
 			self.addFlatBones(digis[se],digiCAT.boneSegs[se])
 			self.createTempTransform(digis[se],digiCAT.boneSegs[se].node )
 			RepeatPosition.append([digis[se],digiCAT.boneSegs[se].node])
-			self.parseHierarchy(digis[se],digiCAT.boneSegs[se],exclude+selfbones,maxDepth,depth+1)
+			#self.parseHierarchy(digis[se],digiCAT.boneSegs[se],exclude+selfbones,maxDepth,depth+1)
 
 		#do this last while the joints articulate into final position
 		
@@ -494,6 +494,16 @@ class Skeleton2CAT:
 			i[1].transform = i[0].transform
 		for i in RepeatPosition:
 			i[1].transform = i[0].transform	
+
+		# delayed action
+		if hasCollar:			
+			self.parseHierarchy(collarbones,parentCAT,exclude+selfbones,maxDepth,depth+1)
+		for se in range(numThighSegments):									
+			self.parseHierarchy(thighs[se],thighCAT.boneSegs[se],exclude+selfbones,maxDepth,depth+1)															
+		for se in range(numCalfSegments):									
+			self.parseHierarchy(calfs[se],calfCAT.boneSegs[se],exclude+selfbones,maxDepth,depth+1)
+		for se in range(numDigiSegments):			
+			self.parseHierarchy(digis[se],digiCAT.boneSegs[se],exclude+selfbones,maxDepth,depth+1)
 			
 			
 		
@@ -588,29 +598,23 @@ class Skeleton2CAT:
 			collarCAT.node.length = self.boneLength(collarbones)
 			self.addFlatBones(collarbones,collarCAT)
 			self.createTempTransform(collarbones,collarCAT.node)	
-			self.parseHierarchy(collarbones,parentCAT,exclude+selfbones,maxDepth,depth+1)
+			#self.parseHierarchy(collarbones,parentCAT,exclude+selfbones,maxDepth,depth+1)
 											
 		for se in range(numUpperSegments):			
 			upperArmCAT.boneSegs[se].node.name = upperarms[se].name	
 			self.addFlatBones(upperarms[se],upperArmCAT.boneSegs[se])		
 			self.createTempTransform(upperarms[se],upperArmCAT.boneSegs[se].node )									
-			self.parseHierarchy(upperarms[se],upperArmCAT.boneSegs[se],exclude+selfbones,maxDepth,depth+1)
+			#self.parseHierarchy(upperarms[se],upperArmCAT.boneSegs[se],exclude+selfbones,maxDepth,depth+1)
 			
 			
 		for se in range(numForeArmSegments):			
 			foreArmCAT.boneSegs[se].node.name = forearms[se].name			
 			self.addFlatBones(forearms[se],foreArmCAT.boneSegs[se])
 			self.createTempTransform(forearms[se],foreArmCAT.boneSegs[se].node )
-			self.parseHierarchy(forearms[se],foreArmCAT.boneSegs[se],exclude+selfbones,maxDepth,depth+1)
+			#self.parseHierarchy(forearms[se],foreArmCAT.boneSegs[se],exclude+selfbones,maxDepth,depth+1)
 			
 
-		#do this last while the joints articulate into final position
 		
-		for se in range(numUpperSegments):						
-			self.parseHierarchy(upperarms[se],upperArmCAT.boneSegs[se],exclude+selfbones,maxDepth,depth+1)
-			
-		for se in range(numForeArmSegments):						
-			self.parseHierarchy(forearms[se],foreArmCAT.boneSegs[se],exclude+selfbones,maxDepth,depth+1)
 		
 
 		upperArmCAT.length = self.armSizes[1]
@@ -665,6 +669,21 @@ class Skeleton2CAT:
 
 			
 			self.parseHierarchy(hand,handCAT,exclude+selfbones,maxDepth,depth+1)
+
+		
+		#do this last while the joints articulate into final position		
+		for se in range(numUpperSegments):						
+			self.parseHierarchy(upperarms[se],upperArmCAT.boneSegs[se],exclude+selfbones,maxDepth,depth+1)
+			
+		for se in range(numForeArmSegments):						
+			self.parseHierarchy(forearms[se],foreArmCAT.boneSegs[se],exclude+selfbones,maxDepth,depth+1)
+
+		# delayed action. only add subbones after everything
+		
+		if hasCollar:
+			self.parseHierarchy(collarbones,parentCAT,exclude+selfbones,maxDepth,depth+1)
+
+		
 			
 		
 	def parseTail(self,parentCAT,c,exclude,maxDepth,depth):
